@@ -1,9 +1,24 @@
+import { useContext } from 'react';
+import { CartContext } from '../../../store/CartContext';
 import MealItemForm from './MealItemForm';
 import classes from './MealItem.module.css';
 
 const MealItem = ({ name, description, price: p, id }) => {
+  const { addItem } = useContext(CartContext);
+
   // format passed prop price (with alias p)
   const price = `${p.toFixed(2)} €`;
+
+  const addToCartHandler = (amount) => {
+    // create new item and add it to cart state items array
+    addItem({
+      id,
+      name,
+      description,
+      price: p, // add price as number, NOT formatted with €
+      amount,
+    });
+  };
 
   return (
     // use li element because it's rendered in a ul
@@ -14,7 +29,7 @@ const MealItem = ({ name, description, price: p, id }) => {
         <div className={classes.price}>{price}</div>
       </div>
       <div>
-        <MealItemForm id={id} />
+        <MealItemForm id={id} onAddToCart={addToCartHandler} />
       </div>
     </li>
   );
