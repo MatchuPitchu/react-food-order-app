@@ -7,7 +7,7 @@ const MealItemForm = ({ id, onAddToCart }) => {
   const [amountValid, setAmountValid] = useState(true);
   const amountInputRef = useRef();
 
-  const submitHandler = (e) => {
+  const submitHandler = e => {
     e.preventDefault();
     // value is always string even if input type is number, remove empty spaces and convert to num with +
     const enteredAmount = +amountInputRef.current.value.trim();
@@ -22,7 +22,7 @@ const MealItemForm = ({ id, onAddToCart }) => {
   return (
     <form className={classes.form} onSubmit={submitHandler}>
       <Input
-        ref={amountInputRef} // forwardRef in Input component needed to make it work
+        ref={amountInputRef} // forwardRef in Input component needed to make ref work
         label='Amount'
         input={{
           id: `amount_${id}`,

@@ -6,13 +6,8 @@ import Cart from './components/Cart/Cart';
 const App = () => {
   const [cartVisible, setCartVisible] = useState(false);
 
-  const showCartHandler = () => {
-    setCartVisible(true);
-  };
-
-  const hideCartHandler = () => {
-    setCartVisible(false);
-  };
+  const showCartHandler = () => setCartVisible(true);
+  const hideCartHandler = () => setCartVisible(false);
 
   return (
     <>
