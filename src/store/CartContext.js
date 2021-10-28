@@ -5,8 +5,9 @@ import { createContext, useReducer } from 'react';
 export const CartContext = createContext({
   items: [],
   totalAmount: 0,
-  addItem: item => {},
-  removeItem: id => {},
+  addItem: (item) => {},
+  removeItem: (id) => {},
+  clearCart: () => {},
 });
 
 // useReducer state management
@@ -23,7 +24,7 @@ const cartReducer = (prevState, action) => {
 
     // logic to manipulate only amount number and NOT add some times the same item in arr of items
     // returns item index if new item already exists in arr
-    const findItemIndex = prevState.items.findIndex(item => item.id === action.item.id);
+    const findItemIndex = prevState.items.findIndex((item) => item.id === action.item.id);
     const foundItem = prevState.items[findItemIndex];
 
     let updatedItems;
@@ -47,8 +48,9 @@ const cartReducer = (prevState, action) => {
       totalAmount: updatedTotal,
     };
   }
+
   if (action.type === 'REMOVE') {
-    const findItemIndex = prevState.items.findIndex(item => item.id === action.id);
+    const findItemIndex = prevState.items.findIndex((item) => item.id === action.id);
     const foundItem = prevState.items[findItemIndex];
     // update total amount
     const updatedTotal = prevState.totalAmount - foundItem.price;
@@ -57,7 +59,7 @@ const cartReducer = (prevState, action) => {
     // if item amount is 1 then remove item entirely from items arr, else reduce amount by one
     if (foundItem.amount === 1) {
       // filter method: all items that don't match action.id will be kept, because then condition evaluates to true
-      updatedItems = prevState.items.filter(item => item.id !== action.id);
+      updatedItems = prevState.items.filter((item) => item.id !== action.id);
     } else {
       const updatedItem = { ...foundItem, amount: foundItem.amount - 1 };
       updatedItems = [...prevState.items];
@@ -69,6 +71,9 @@ const cartReducer = (prevState, action) => {
       totalAmount: updatedTotal,
     };
   }
+
+  if (action.type === 'CLEAR') return defaultCartState;
+
   // default fallback
   return defaultCartState;
 };
@@ -77,14 +82,18 @@ const cartReducer = (prevState, action) => {
 const CartStateProvider = ({ children }) => {
   const [cartState, dispatchCartAction] = useReducer(cartReducer, defaultCartState);
 
-  const addItem = item => {
+  const addItem = (item) => {
     dispatchCartAction({
       type: 'ADD',
       item,
     });
   };
-  const removeItem = id => {
+  const removeItem = (id) => {
     dispatchCartAction({ type: 'REMOVE', id });
+  };
+
+  const clearCart = () => {
+    dispatchCartAction({ type: 'CLEAR' });
   };
 
   // instead of having all values in JSX code below, put it outside of JSX in a variable
@@ -93,6 +102,7 @@ const CartStateProvider = ({ children }) => {
     totalAmount: cartState.totalAmount,
     addItem,
     removeItem,
+    clearCart,
   };
 
   return <CartContext.Provider value={cartContext}>{children}</CartContext.Provider>;

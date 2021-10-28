@@ -5,7 +5,7 @@ import classes from './Checkout.module.css';
 const notEmpty = (value) => !!value.trim();
 const fiveChars = (value) => value.trim().length === 5;
 
-const Checkout = ({ onCancel }) => {
+const Checkout = ({ onSubmit, onCancel }) => {
   const [formValidity, setFormValidity] = useState({
     name: true,
     street: true,
@@ -23,10 +23,15 @@ const Checkout = ({ onCancel }) => {
 
     // using useRef to get values + simple validation
     // -> for better and more complexe state input handling look at react form repo
-    const nameValid = notEmpty(nameRef.current.value);
-    const streetValid = notEmpty(streetRef.current.value);
-    const postalValid = fiveChars(postalRef.current.value);
-    const cityValid = notEmpty(cityRef.current.value);
+    const name = nameRef.current.value;
+    const street = streetRef.current.value;
+    const postal = postalRef.current.value;
+    const city = cityRef.current.value;
+
+    const nameValid = notEmpty(name);
+    const streetValid = notEmpty(street);
+    const postalValid = fiveChars(postal);
+    const cityValid = notEmpty(city);
 
     setFormValidity({
       name: nameValid,
@@ -36,12 +41,15 @@ const Checkout = ({ onCancel }) => {
     });
 
     const formValid = nameValid && streetValid && postalValid && cityValid; // only if all true then formValid true
+    if (!formValid) return;
 
-    if (!formValid) {
-      return;
-    }
-
-    // Submit cart data
+    // Submit cart data -> pass via prop fn to parent component
+    onSubmit({
+      name,
+      street,
+      postal,
+      city,
+    });
   };
 
   // here code duplication -> could build input components
@@ -62,7 +70,7 @@ const Checkout = ({ onCancel }) => {
         {!formValidity.street && <p>Please enter valid street</p>}
       </div>
       <div className={controlClasses('postal')}>
-        <label htmlFor='postal'>Street</label>
+        <label htmlFor='postal'>Postal Code</label>
         {/* postal code is type text to be able to start with 0 */}
         <input ref={postalRef} type='text' id='postal' name='postal' />
         {!formValidity.postal && <p>Please enter valid postal code (5 characters)</p>}

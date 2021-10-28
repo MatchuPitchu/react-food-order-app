@@ -6,8 +6,10 @@ import classes from './Cart.module.css';
 import Checkout from './Checkout';
 
 const Cart = ({ onClose }) => {
-  const { items, totalAmount, addItem, removeItem } = useContext(CartContext);
+  const { items, totalAmount, addItem, removeItem, clearCart } = useContext(CartContext);
   const [checkout, setCheckout] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [didSubmit, setDidSubmit] = useState(false);
 
   const total = `${totalAmount.toFixed(2)} €`;
   const hasItems = items.length > 0;
@@ -24,6 +26,27 @@ const Cart = ({ onClose }) => {
   };
 
   const orderHandler = () => setCheckout(true);
+
+  const submitOrderHandler = async (userData) => {
+    setSubmitting(true);
+    const options = {
+      method: 'POST',
+      body: JSON.stringify({
+        user: userData,
+        order: items,
+      }),
+    };
+
+    // in real case ADD error handling
+    // .json in URL is Firebase specific
+    await fetch(
+      'https://react-http-ba0a9-default-rtdb.europe-west1.firebasedatabase.app/orders.json',
+      options
+    );
+    setSubmitting(false);
+    setDidSubmit(true);
+    clearCart();
+  };
 
   const cartItems = (
     <ul className={classes['cart-items']}>
@@ -58,15 +81,36 @@ const Cart = ({ onClose }) => {
     </div>
   );
 
-  return (
-    // return JSX code in a modal wrapper
-    <Modal onClose={onClose}>
+  const cartModalContent = (
+    <>
+      {' '}
       {cartItems}
       <div className={classes.total}>
         <span>Total Amount</span>
         <span>{total}</span>
       </div>
-      {checkout ? <Checkout onCancel={onClose} /> : modalActions}
+      {checkout ? <Checkout onSubmit={submitOrderHandler} onCancel={onClose} /> : modalActions}
+    </>
+  );
+
+  const submittingModalContent = <p>Sending order data ...</p>;
+  const didSubmitModalContent = (
+    <>
+      <p>Successfully sent the order</p>
+      <div className={classes.actions}>
+        <button className={classes.button} onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    // return JSX code in a modal wrapper
+    <Modal onClose={onClose}>
+      {!submitting && !didSubmit && cartModalContent}
+      {submitting && submittingModalContent}
+      {!submitting && didSubmit && didSubmitModalContent}
     </Modal>
   );
 };
