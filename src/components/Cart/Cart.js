@@ -1,29 +1,33 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CartContext } from '../../store/CartContext';
 import Modal from '../UI/Modal';
 import CartItem from './CartItem';
 import classes from './Cart.module.css';
+import Checkout from './Checkout';
 
 const Cart = ({ onClose }) => {
   const { items, totalAmount, addItem, removeItem } = useContext(CartContext);
+  const [checkout, setCheckout] = useState(false);
 
   const total = `${totalAmount.toFixed(2)} €`;
   const hasItems = items.length > 0;
 
-  const cartItemRemoveHandler = id => {
+  const cartItemRemoveHandler = (id) => {
     removeItem(id);
   };
 
-  const cartItemAddHandler = item => {
+  const cartItemAddHandler = (item) => {
     // use spread operator and overwrite amount to 1
     // because add Btn in <CartItem/> should always only add 1 more,
     // NOT add the same amount of this item always in the storage
     addItem({ ...item, amount: 1 });
   };
 
+  const orderHandler = () => setCheckout(true);
+
   const cartItems = (
     <ul className={classes['cart-items']}>
-      {items.map(item => (
+      {items.map((item) => (
         <CartItem
           key={item.id}
           name={item.name}
@@ -40,6 +44,20 @@ const Cart = ({ onClose }) => {
     </ul>
   );
 
+  const modalActions = (
+    <div className={classes.actions}>
+      <button className={classes['button--alt']} onClick={onClose}>
+        Close
+      </button>
+      {/* only render button if items in Cart */}
+      {hasItems && (
+        <button className={classes.button} onClick={orderHandler}>
+          Order
+        </button>
+      )}
+    </div>
+  );
+
   return (
     // return JSX code in a modal wrapper
     <Modal onClose={onClose}>
@@ -48,13 +66,7 @@ const Cart = ({ onClose }) => {
         <span>Total Amount</span>
         <span>{total}</span>
       </div>
-      <div className={classes.actions}>
-        <button className={classes['button--alt']} onClick={onClose}>
-          Close
-        </button>
-        {/* only render button if items in Cart */}
-        {hasItems && <button className={classes.button}>Order</button>}
-      </div>
+      {checkout ? <Checkout onCancel={onClose} /> : modalActions}
     </Modal>
   );
 };
