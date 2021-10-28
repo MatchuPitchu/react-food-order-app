@@ -3,12 +3,14 @@
 Practice project for all basic and advanced concepts of React:
 
 - small and reusable components
-- form
+- forms (checkout and order form)
 - Modal via React Portal
 - state management
 - useReducer Hook
 - ref and forward refs
 - useEffect Hook
+- submitting orders to a backend server via HTTP
+- fetching data (from Firebase)
 
 # Getting Started with Create React App
 
